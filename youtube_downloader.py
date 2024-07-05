@@ -38,12 +38,12 @@ def get_info(url):
     return details
 #st.sidebar.title(f"Welcome {name}")
 st.title("YouTube Downloader 🚀")
-url = st.text_input("Paste URL here 👇", placeholder='https://www.youtube.com/')
+url = st.text_input("Colar Link aqui 👇", placeholder='https://www.youtube.com/')
 buffer = BytesIO()
 mime = ""
 
 if url:
-    media_format = st.selectbox('__Select Resolution__', ("","MP3","MP4"))
+    media_format = st.selectbox('__Escolha o Formato__', ("","MP3","MP4"))
 
     v_info= get_info(url)
     col1, col2= st.columns([1,1.5], gap="small")
@@ -52,7 +52,7 @@ if url:
             st.image(v_info["image"])   
         with col2:
             st.subheader("Video Details ⚙️")
-            res_inp = st.selectbox('__Select Resolution__',v_info["resolutions"])
+            res_inp = st.selectbox('__Escolha a Resolução__',v_info["resolutions"])
             id = v_info["resolutions"].index(res_inp)            
             st.write(f"__Title:__ {v_info['title']}")
             st.write(f"__Length:__ {v_info['length']} sec")
@@ -79,8 +79,8 @@ if url:
                     # extract only audio 
                     audio = yt.streams.filter(only_audio=True).first()
                     audio.stream_to_buffer(buffer)
-                    if st.download_button("Save File ⚡️", buffer ,file_name,mime):
-                        st.success('Download Complete', icon="✅") 
+                    if st.download_button("Salvar ⚡️", buffer ,file_name,mime):
+                        st.success('Download Completo', icon="✅") 
                         print("%s - Downloaded File: %s" %(parsed_now, file_name))  
                         st.balloons()
 
@@ -97,8 +97,8 @@ if url:
                     file_name = v_info['title'] + ".mp4"
                 try:
                     ds.stream_to_buffer(buffer)
-                    st.download_button("Save File ⚡️", buffer ,file_name,mime) 
-                    st.success('Download Complete', icon="✅")   
+                    st.download_button("Salvar ⚡️", buffer ,file_name,mime) 
+                    st.success('Download Completo', icon="✅")   
                     print("%s - Downloaded File: %s" %(parsed_now, file_name))         
                     st.balloons()
                         
