@@ -40,6 +40,49 @@ def get_info(url):
     return details
 #st.sidebar.title(f"Welcome {name}")
 st.title("YouTube Downloader ⬇️")
+
+
+
+itens = 20
+@st.cache_resource()
+def query_youtube(query):
+    videosSearch = VideosSearch(query, limit = itens)
+    video_list = {}
+    query_result = videosSearch.result()["result"]
+
+    for item in range(len(query_result)):
+        video_list.update([(f"item_{item}", [query_result[item]["thumbnails"][0], query_result[item]["title"], "https://www.youtube.com/watch?v=%s" %(query_result[item]["id"])])])
+    
+    return video_list
+
+with st.container(height=100, border=False):
+        url = st.text_input("Pesquise video e copie o link 🔎", placeholder='Exemplo: Rock 80')
+#@st.experimental_dialog("Cast your vote")
+with st.container(height=500, border=False):
+    #with st.expander("Youtube Player 🎵"):
+        #st.sidebar.title(f"Welcome {name}")
+    #st.title("YouTube Player ")
+    
+
+    if url:
+        with st.spinner('Buscando vídeos aguarde ...'):
+            video_list = query_youtube(url)
+
+        
+        col1, col2= st.columns([1,1.5], gap="small")
+
+        lists = []
+
+        
+        with st.container():
+            for i in video_list.items():
+                        
+                        st.subheader(i[1][1])
+                        st.video(i[1][2])
+                        st.write(i[1][2])
+
+
+
 url = st.text_input("Colar Link aqui 👇", placeholder='https://www.youtube.com/')
 buffer = BytesIO()
 mime = ""
@@ -111,41 +154,3 @@ if url:
                 except:
                     st.error('Error: Save with a different name!', icon="🚨")  
             
-
-itens = 20
-@st.cache_resource()
-def query_youtube(query):
-    videosSearch = VideosSearch(query, limit = itens)
-    video_list = {}
-    query_result = videosSearch.result()["result"]
-
-    for item in range(len(query_result)):
-        video_list.update([(f"item_{item}", [query_result[item]["thumbnails"][0], query_result[item]["title"], "https://www.youtube.com/watch?v=%s" %(query_result[item]["id"])])])
-    
-    return video_list
-
-
-#@st.experimental_dialog("Cast your vote")
-with st.container(height=500):
-    with st.expander("Youtube Player 🎵"):
-        #st.sidebar.title(f"Welcome {name}")
-        st.title("YouTube Player ")
-        with st.container():
-            url = st.text_input("Pesquise seus videos 👇", placeholder='')
-
-        if url:
-            with st.spinner('Buscando vídeos aguarde ...'):
-                video_list = query_youtube(url)
-
-            
-            col1, col2= st.columns([1,1.5], gap="small")
-
-            lists = []
-
-            
-            with st.container():
-                for i in video_list.items():
-                            
-                            st.subheader(i[1][1])
-                            st.video(i[1][2])
-                            st.write(i[1][2])
