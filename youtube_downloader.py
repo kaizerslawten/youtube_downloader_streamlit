@@ -7,10 +7,12 @@ import datetime
 import pickle
 from pathlib import Path
 import streamlit_authenticator as stauth
+from youtubesearchpython import VideosSearch
 
 # Get the current date and time
 now = datetime.datetime.now()
 parsed_now = now.strftime("%d-%m-%Y %H:%M:%S")
+
 
 @st.cache_resource()
 def get_info(url):
@@ -37,10 +39,12 @@ def get_info(url):
     details["format"]= vformat
     return details
 #st.sidebar.title(f"Welcome {name}")
-st.title("YouTube Downloader 🚀")
+st.title("YouTube Downloader ⬇️")
 url = st.text_input("Colar Link aqui 👇", placeholder='https://www.youtube.com/')
 buffer = BytesIO()
 mime = ""
+
+
 
 if url:
     media_format = st.selectbox('__Escolha o Formato__', ("","MP3","MP4"))
@@ -78,7 +82,8 @@ if url:
                     yt = YouTube(url)
                     # extract only audio 
                     audio = yt.streams.filter(only_audio=True).first()
-                    audio.stream_to_buffer(buffer)
+                    with st.spinner('Convertendo arquivo de áudio aguarde ...'):
+                        audio.stream_to_buffer(buffer)
                     if st.download_button("Salvar ⚡️", buffer ,file_name,mime):
                         st.success('Download Completo', icon="✅") 
                         print("%s - Downloaded File: %s" %(parsed_now, file_name))  
@@ -96,7 +101,8 @@ if url:
                 else:
                     file_name = v_info['title'] + ".mp4"
                 try:
-                    ds.stream_to_buffer(buffer)
+                    with st.spinner('Convertendo arquivo de vídeo aguarde ...'):
+                        ds.stream_to_buffer(buffer)
                     st.download_button("Salvar ⚡️", buffer ,file_name,mime) 
                     st.success('Download Completo', icon="✅")   
                     print("%s - Downloaded File: %s" %(parsed_now, file_name))         
@@ -105,4 +111,41 @@ if url:
                 except:
                     st.error('Error: Save with a different name!', icon="🚨")  
             
-        
+
+itens = 20
+@st.cache_resource()
+def query_youtube(query):
+    videosSearch = VideosSearch(query, limit = itens)
+    video_list = {}
+    query_result = videosSearch.result()["result"]
+
+    for item in range(len(query_result)):
+        video_list.update([(f"item_{item}", [query_result[item]["thumbnails"][0], query_result[item]["title"], "https://www.youtube.com/watch?v=%s" %(query_result[item]["id"])])])
+    
+    return video_list
+
+
+#@st.experimental_dialog("Cast your vote")
+with st.container(height=500):
+    with st.expander("Youtube Player 🎵"):
+        #st.sidebar.title(f"Welcome {name}")
+        st.title("YouTube Player ")
+        with st.container():
+            url = st.text_input("Pesquise seus videos 👇", placeholder='')
+
+        if url:
+            with st.spinner('Buscando vídeos aguarde ...'):
+                video_list = query_youtube(url)
+
+            
+            col1, col2= st.columns([1,1.5], gap="small")
+
+            lists = []
+
+            
+            with st.container():
+                for i in video_list.items():
+                            
+                            st.subheader(i[1][1])
+                            st.video(i[1][2])
+                            st.write(i[1][2])
